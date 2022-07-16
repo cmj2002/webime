@@ -164,10 +164,10 @@ export class InputArea extends React.Component<{ fix: boolean, partical: boolean
     private async getCandidates() {
         // Fetch candidates from server
         const url = `${serverURL}?start=${this._state.currCandidateStart}&size=${pageSize}&text=${this._state.currInput}&fix=${this.props.fix}&partical=${this.props.partical}`;
-        const response = await fetch(url);
         this.timeStatistic.fetch = new Date().getTime();
-        const json: ServerResponse = await response.json();
+        const response = await fetch(url);
         this.timeStatistic.fetch = new Date().getTime() - this.timeStatistic.fetch;
+        const json: ServerResponse = await response.json();
         if (json.status === 200) {
             this._state.hasNextPage = (json.totalSize > this._state.currCandidateStart + pageSize);
             this._state.hasPrevPage = (this._state.currCandidateStart >= pageSize);
