@@ -1,0 +1,8 @@
+Flask
+gunicorn
+gevent
+requests
+tqdm
+numpy
+pypinyin
+flask-cors

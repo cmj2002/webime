@@ -1,0 +1,7 @@
+.git
+.dockerignore
+.gitignore
+backup
+.idea
+frontend
+!frontend/build
