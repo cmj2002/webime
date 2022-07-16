@@ -5,4 +5,5 @@ backup
 .idea
 frontend
 README.md
+.devcontainer
 !frontend/build
