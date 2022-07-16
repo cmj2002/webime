@@ -4,4 +4,5 @@
 backup
 .idea
 frontend
+README.md
 !frontend/build
