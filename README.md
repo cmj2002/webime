@@ -14,7 +14,22 @@
 
 在安装了 Docker 的机器上运行命令：`docker run -p 8080:80 caomingjun/webime` 并访问 `http://localhost:8080` 
 
-## 开发
+## 开发容器
+
+本仓库包含了 `.devcontainer` ，可以在 VSCode 内使用开发容器打开。
+
+在创建容器时会安装所有依赖并进行前端构建。完成后可以直接运行 `python server.py` 启动服务器。容器也内置了 Docker ，运行下面的命令即可构建并测试 Docker：
+
+```bash
+$ docker build -t webime .
+$ docker run -p 8080:80 caomingjun/webime
+```
+
+VSCode 会处理好端口转发。
+
+## 本地开发
+
+如果你要在本地开发，可以执行下面的步骤。
 
 ### 前端
 
