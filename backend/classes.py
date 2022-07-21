@@ -34,7 +34,7 @@ class Answer:
 
     def get_prob(self) -> float:
         assert self.probability is not None
-        return log(self.prior) + self.probability
+        return (log(self.prior) + self.probability)/len(self.answer)
 
     def get_origin(self) -> str:
         return ''.join(self.partition)

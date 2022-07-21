@@ -5,8 +5,7 @@ import {
   Grid,
   GridItem,
   theme,
-  Switch,
-  Divider,
+  useToast
 } from "@chakra-ui/react"
 import { Navbar } from "./components/navbar"
 import { Footer } from "./components/footer"
@@ -19,6 +18,7 @@ import { Switcher } from "./components/Switcher"
 export const App = () => {
   const [fix,setFix] = React.useState(true);
   const [partical,setPartical] = React.useState(true);
+  const toast=useToast();
   return (
     <ChakraProvider theme={theme}>
       <Grid
@@ -46,7 +46,21 @@ export const App = () => {
           </Box>
         </GridItem>
         <GridItem m='3' area={'textarea'}>
-          <InputArea fix={fix} partical={partical}/>
+          <InputArea 
+          fix={fix} 
+          partical={partical} 
+          toast={function(
+            title: string,
+            status: "success" | "error" | "warning" | "info",
+            isClosable: boolean,
+            description: string,
+          ){toast({
+            title,
+            status,
+            isClosable,
+            description,
+          })}}
+        />
         </GridItem>
         <GridItem area={'right'}>
           <Box p='3' mr='3' my='3' bg="white" borderWidth='3px' borderRadius='lg' borderColor="rgba(255, 255, 255, .5)" overflow='hidden' height='calc(100% - 1.5rem)'>

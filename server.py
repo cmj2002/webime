@@ -63,7 +63,7 @@ def get_andidate():
     b, key = check_param(params, ["text", "start", "size", "fix", "partical"])
     if not b:
         return jsonify({"status": 400, "error": f"Missing parameter: {key}."}), 400
-    result = compute(params["text"], SEARCH_WIDTH if SEARCH_WIDTH else 3 * int(params["size"]), params["fix"] == "true", params["partical"] == "true")
+    result = compute(params["text"], SEARCH_WIDTH if SEARCH_WIDTH else 3*int(params["size"]), params["fix"] == "true", params["partical"] == "true")
     res = {"status": 200, "data": [], "totalSize": len(result), "computeTime": 0}
     for i in range(int(params["size"])):
         if int(params["start"]) + i < len(result):

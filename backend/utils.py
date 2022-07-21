@@ -23,10 +23,10 @@ COMMON_INCOMPLETE_DEGRADE = 0.75
 ERROR_CORRECTION_DEGRADE = 0.125
 
 # environment variables
-if 'CACHE_SIZE' in os.environ:
-    CACHE_SIZE = int(os.environ['CACHE_SIZE'])
+if 'PAGE_CACHE_SIZE' in os.environ:
+    PAGE_CACHE_SIZE = int(os.environ['PAGE_CACHE_SIZE'])
 else:
-    CACHE_SIZE = 32
+    PAGE_CACHE_SIZE = 32
 
 
 def is_chinese(char: str) -> bool:

@@ -5,7 +5,7 @@ import {
     Icon,
     VStack,
     HStack,
-    Divider
+    Divider,
 } from "@chakra-ui/react";
 import * as React from "react"
 import textarea_caret from "textarea-caret";
@@ -51,10 +51,22 @@ interface TimeStatistic {
     javascript: number;
 }
 
+// a function to send a toasted message to the user
+interface sendToast{
+    (
+        title: string,
+        status: "success" | "error" | "warning" | "info",
+        isClosable: boolean,
+        description: string,
+    ): void;
+}
+
 const digitsReg = new RegExp('^[1-9]+$');
 const pageSize = 10;
 const extraBorder = 8;
 const serverURL = "/api/candidate";
+// timeout in milliseconds
+const TIMEOUT = 10000;
 
 const defaultState: State = {
     currInput: '',
@@ -75,17 +87,23 @@ function isLetter(c: string): boolean {
     return c.length === 1 && c.toLowerCase() !== c.toUpperCase();
 }
 
-export class InputArea extends React.Component<{ fix: boolean, partical: boolean }, {}> {
+export class InputArea extends React.Component<{ fix: boolean, partical: boolean,toast:sendToast }, {}> {
     private queue: Promise<void>;
     private InputAreaRef: React.RefObject<HTMLTextAreaElement>;
     private _state: State;
     private timeStatistic: TimeStatistic;
+    private prevState: State;
+    private queueLen: number;
+    private popLen: number;
 
-    constructor(props: { fix: boolean, partical: boolean }) {
+    constructor(props: { fix: boolean, partical: boolean,toast:sendToast }) {
         super(props);
         this.queue = Promise.resolve();
+        this.queueLen = 0;
+        this.popLen = 0;
         this.InputAreaRef = React.createRef();
         this._state = defaultState;
+        this.prevState = defaultState;
         this.timeStatistic = {
             start: 0,
             total: 0,
@@ -164,18 +182,38 @@ export class InputArea extends React.Component<{ fix: boolean, partical: boolean
     private async getCandidates() {
         // Fetch candidates from server
         const url = `${serverURL}?start=${this._state.currCandidateStart}&size=${pageSize}&text=${this._state.currInput}&fix=${this.props.fix}&partical=${this.props.partical}`;
-        this.timeStatistic.fetch = new Date().getTime();
-        const response = await fetch(url);
-        this.timeStatistic.fetch = new Date().getTime() - this.timeStatistic.fetch;
-        const json: ServerResponse = await response.json();
-        if (json.status === 200) {
-            this._state.hasNextPage = (json.totalSize > this._state.currCandidateStart + pageSize);
-            this._state.hasPrevPage = (this._state.currCandidateStart >= pageSize);
-            this.setCandidates(json.data);
-            this.timeStatistic.hmm = json.computeTime;
-        } else {
-            console.error("get candidates failed: ", json);
-            throw new Error("get candidates failed");
+        try{
+            this.timeStatistic.fetch = new Date().getTime();
+            // ser timeout
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => controller.abort(), TIMEOUT)
+            const response = await fetch(url, { signal: controller.signal });
+            this.timeStatistic.fetch = new Date().getTime() - this.timeStatistic.fetch;
+            if (response.status === 200) {
+                const json: ServerResponse = await response.json();
+                this._state.hasNextPage = (json.totalSize > this._state.currCandidateStart + pageSize);
+                this._state.hasPrevPage = (this._state.currCandidateStart >= pageSize);
+                this.setCandidates(json.data);
+                this.timeStatistic.hmm = json.computeTime;
+            } else {
+                console.error("get candidates failed: ", await response.text());
+                throw new Error(`Status code ${response.status}`);
+            }
+        }catch(e){
+            this._state=structuredClone(this.prevState);
+            let errMsg:string="Unknown error, please check console";
+            if(e instanceof Error){
+                errMsg=(e.name==="AbortError")?`Request time out!`:`${e.name}: ${e.message}`;
+            }
+            this.props.toast(
+                "网络请求出错，请稍后再试",
+                "error",
+                true,
+                errMsg,
+            )
+            console.error("get candidates failed: ", e);
+            // cancel all requests after error
+            this.popLen = this.queueLen;
         }
     }
 
@@ -241,6 +279,12 @@ export class InputArea extends React.Component<{ fix: boolean, partical: boolean
     }
 
     private async handleKeydown(evt: React.KeyboardEvent<HTMLTextAreaElement>, start: number) {
+        this.queueLen--;
+        if (this.popLen > 0) {
+            this.popLen--;
+            return;
+        }
+        this.prevState = structuredClone(this._state);
         this.initTimeStatistic(start);
         if (evt.key === 'Shift' && (evt.altKey || evt.ctrlKey)) {
             return;
@@ -297,6 +341,7 @@ export class InputArea extends React.Component<{ fix: boolean, partical: boolean
             evt.stopPropagation();
         }
         this.queue = this.queue.then(async () => { await this.handleKeydown(evt, start); });
+        this.queueLen++;
     }
 
     render(): React.ReactNode {

@@ -3,6 +3,7 @@ from backend.cut import cut
 from backend.hmm import viterbi
 from functools import lru_cache
 from backend.utils import *
+import time
 
 
 def merge(pinyin: str, common_answers: List[Answer], error_answers: List[Answer]) -> List[Answer]:
@@ -30,8 +31,9 @@ def merge(pinyin: str, common_answers: List[Answer], error_answers: List[Answer]
         common_answers.append(simpleAnswer)
     common_answers.sort(key=lambda x: x.get_prob(), reverse=True)
     first = common_answers[0]
-    res = common_answers[1:] + error_answers
-    for answer in res:
+    _res = common_answers[1:] + error_answers
+    res = []
+    for answer in _res:
         index = in_list(answer, res)
         if answer.answer is not None and first.answer is not None and answer.answer == first.answer:
             continue
@@ -43,7 +45,7 @@ def merge(pinyin: str, common_answers: List[Answer], error_answers: List[Answer]
     return [first] + sorted(res, key=lambda x: x.get_prob(), reverse=True)
 
 
-@lru_cache(maxsize=CACHE_SIZE)
+@lru_cache(maxsize=PAGE_CACHE_SIZE)
 def compute(pinyin: str, width: int, error_correction, partical) -> List[Dict]:
     """
     Compute all probability of pinyin.
@@ -94,3 +96,9 @@ def compute(pinyin: str, width: int, error_correction, partical) -> List[Dict]:
         'process_to': r.process_to,
         'answer': r.answer
     } for r in answers]
+
+def test():
+    start=time.time()
+    out=compute('nanjingdaxuerengongzhinengxueyuan', 10, True, False)
+    print(time.time()-start)
+    print(out)
