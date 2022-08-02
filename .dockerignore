@@ -1,9 +1,6 @@
-.git
-.dockerignore
-.gitignore
-backup
-.idea
-frontend
-README.md
-.devcontainer
+*
 !frontend/build
+!backend
+!server.py
+!requirements.txt
+!gunicorn.conf.py

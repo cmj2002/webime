@@ -29,7 +29,7 @@ export const Navbar = () => {
               fontSize="lg"
               variant="ghost"
               color="current"
-              onClick={() => openInNewTab('https://github.com/cmj2002/')} />
+              onClick={() => openInNewTab('https://github.com/cmj2002/webime')} />
           </HStack>
       </HStack>
     </Box>
