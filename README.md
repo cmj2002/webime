@@ -54,5 +54,7 @@ $ docker build -t webime .
 $ docker run -p 8080:80 caomingjun/webime
 ```
 
+## 致谢
 
+HMM 模型的训练使用了[北京语言大学BCC语料库](http://bcc.blcu.edu.cn/)。
 
