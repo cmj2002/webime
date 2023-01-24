@@ -4,13 +4,7 @@
 
 目前仅支持在电脑端使用，**使用时请关闭电脑自带的输入法**
 
-## 立即体验
-
-### 使用在线 Demo
-
-访问 https://ime.caomingjun.com 即可
-
-### Docker 部署
+## Docker 部署
 
 在安装了 Docker 的机器上运行命令：`docker run -p 8080:80 caomingjun/webime` 并访问 `http://localhost:8080` 
 
